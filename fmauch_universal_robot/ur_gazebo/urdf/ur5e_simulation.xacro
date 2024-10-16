@@ -1,0 +1,40 @@
+<?xml version="1.0" ?>
+<robot name="hrc_simulation" xmlns:xacro="http://ros.org/wiki/xacro">
+    
+    <!-- 引入 UR5e 的描述文件 -->
+    <xacro:include filename="$(find vention_conveyor_description)/urdf/workbench_table.urdf.xacro" />  
+    <xacro:workbench_table prefix="" />    
+    
+    <link name="world" />
+    <!--joint that connects world and workbench-->
+    <joint name="world_joint" type="fixed">
+        <parent link="world" />
+        <child link="workbench_base" />
+        <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
+    </joint>     
+              
+    <xacro:include filename="$(find ur_description)/urdf/inc/ur5e_macro.xacro" />              
+    <xacro:ur5e_robot prefix="ur5e_"/>
+
+
+    <joint name="ur5e_workbench_joint" type="fixed">
+        <parent link="workbench_mount" />
+        <child link="ur5e_base_link" />
+        <origin xyz="0.0 0.0 0.00" rpy="0 0.0 3.14159" />
+    </joint>
+    
+    <xacro:include filename="$(find robotiq_85_description)/urdf/robotiq_85_gripper.urdf.xacro" />
+    
+    <xacro:robotiq_85_gripper prefix="" parent="ur5e_wrist_3_link">
+      <origin xyz="0 0 0" rpy="0 -1.5708 0"/>
+    </xacro:robotiq_85_gripper>    
+    
+    
+    
+
+
+        
+
+
+    
+</robot>

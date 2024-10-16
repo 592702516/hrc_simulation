@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<robot name="ur5e_with_robot" xmlns:xacro="https://ros.org/wiki/xacro">
+
+
+    <xacro:property name="prefix" value="" />
+    <!-- workbench-->
+    <xacro:include filename="$(find vention_conveyor_description)/urdf/workbench_table.urdf.xacro" />
+
+    <link name="world" />
+
+    <!--joint that connects world and workbench-->
+    <joint name="world_joint" type="fixed">
+        <parent link="world" />
+        <child link="workbench_base" />
+        <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
+    </joint>
+
+    <xacro:workbench_table prefix="" />
+
+
+  
+    <xacro:include filename="$(find robotiq_85_description)/urdf/robotiq_85_gripper.urdf.xacro" />
+
+    <xacro:robotiq_85_gripper prefix="" parent="workbench_mount">
+      <origin xyz="0 0 0.1" rpy="0 0 0"/>
+    </xacro:robotiq_85_gripper>
+
+
+
+
+</robot>

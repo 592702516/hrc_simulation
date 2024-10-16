@@ -1,0 +1,24 @@
+<?xml version="1.0" ?>
+<robot name="ur5e_with_gripper" xmlns:xacro="http://ros.org/wiki/xacro">
+    
+    <!-- 引入 UR5e 的描述文件 -->
+    <xacro:include filename="$(find robotiq_85_description)/urdf/robotiq_85_gripper.urdf.xacro" />
+    <xacro:include filename="$(find ur_description)/urdf/inc/ur5e_macro.xacro" />      
+       
+    
+    <xacro:ur5e_robot prefix="ur5e_"/>
+    
+    <xacro:robotiq_85_gripper prefix="" parent="ur5e_wrist_3_link">
+      <origin xyz="0 0 0" rpy="0 -1.5708 0"/>
+    </xacro:robotiq_85_gripper>
+        
+    <link name="world"/>
+    <joint name="world_joint" type="fixed">
+        <parent link="world"/>
+        <child link="ur5e_base_link"/> 
+        <origin xyz="0 0 0.5" rpy="0 0 0"/>
+    </joint>  
+
+
+    
+</robot>
