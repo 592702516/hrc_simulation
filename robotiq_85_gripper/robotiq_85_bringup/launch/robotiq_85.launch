@@ -11,7 +11,7 @@
         <param name="comport" value="$(arg comport)" />
         <param name="baud" value="$(arg baud)" />
     </node>
-
+asdas 
 
     <!-- Gripper specific robot state publisher and parameters -->
     <!-- <include file="$(find robotiq_85_description)/launch/upload_robotiq_85_gripper.launch"/> -->
