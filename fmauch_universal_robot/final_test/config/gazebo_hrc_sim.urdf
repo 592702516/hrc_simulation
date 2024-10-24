@@ -683,11 +683,37 @@
                     <far>8.0</far>
                 </clip>
             </camera>
-            <plugin filename="libgazebo_ros_camera.so" name="camera_controller_1">
-                <frame_name>camera_base_optical_1</frame_name>
+            <plugin filename="libgazebo_ros_openni_kinect.so" name="camera_controller_1">
+                <!-- <frame_name>camera_base_optical_1</frame_name>
                 <cameraName>azure_kinect_camera_1</cameraName>
                 <min_depth>0.1</min_depth>
                 <max_depth>10</max_depth>
+                <pointCloudTopicName>depth/points</pointCloudTopicName>             
+                <pointCloudCutoff>0.3</pointCloudCutoff> -->
+                <baseline>0.2</baseline>
+                <alwaysOn>true</alwaysOn>
+                <!-- Keep this zero, update_rate in the parent <sensor> tag
+                will control the frame rate. -->
+                <updateRate>0.0</updateRate>
+                <cameraName>azure_kinect_camera_1</cameraName>
+                <imageTopicName>/azure_kinect_camera_1/color/image_raw</imageTopicName>
+                <cameraInfoTopicName>/azure_kinect_camera_1/color/camera_info</cameraInfoTopicName>
+                <depthImageTopicName>/azure_kinect_camera_1/depth/image_raw</depthImageTopicName>
+                <depthImageCameraInfoTopicName>/azure_kinect_camera_1/depth/camera_info</depthImageCameraInfoTopicName>
+                <pointCloudTopicName>/azure_kinect_camera_1/depth/points</pointCloudTopicName>
+                <frameName>camera_base_optical_1</frameName>
+                <pointCloudCutoff>0.5</pointCloudCutoff>
+                <pointCloudCutoffMax>3.0</pointCloudCutoffMax>
+                <distortionK1>0</distortionK1>
+                <distortionK2>0</distortionK2>
+                <distortionK3>0</distortionK3>
+                <distortionT1>0</distortionT1>
+                <distortionT2>0</distortionT2>
+                <CxPrime>0</CxPrime>
+                <Cx>0</Cx>
+                <Cy>0</Cy>
+                <focalLength>0</focalLength>
+                <hackBaseline>0</hackBaseline>
             </plugin>
         </sensor>
         <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
@@ -802,11 +828,37 @@
                     <far>8.0</far>
                 </clip>
             </camera>
-            <plugin filename="libgazebo_ros_camera.so" name="camera_controller">
-                <frame_name>camera_base_optical</frame_name>
+            <plugin filename="libgazebo_ros_openni_kinect.so" name="camera_controller">
+                <!-- <frame_name>camera_base_optical</frame_name>
                 <cameraName>azure_kinect_camera</cameraName>
                 <min_depth>0.1</min_depth>
                 <max_depth>10</max_depth>
+                <pointCloudTopicName>depth/points</pointCloudTopicName>              
+                <pointCloudCutoff>0.3</pointCloudCutoff> -->
+                <baseline>0.2</baseline>
+                <alwaysOn>true</alwaysOn>
+                <!-- Keep this zero, update_rate in the parent <sensor> tag
+                will control the frame rate. -->
+                <updateRate>0.0</updateRate>
+                <cameraName>azure_kinect_camera</cameraName>
+                <imageTopicName>/azure_kinect_camera/color/image_raw</imageTopicName>
+                <cameraInfoTopicName>/azure_kinect_camera/color/camera_info</cameraInfoTopicName>
+                <depthImageTopicName>/azure_kinect_camera/depth/image_raw</depthImageTopicName>
+                <depthImageCameraInfoTopicName>/azure_kinect_camera/depth/camera_info</depthImageCameraInfoTopicName>
+                <pointCloudTopicName>/azure_kinect_camera/depth/points</pointCloudTopicName>
+                <frameName>camera_base_optical</frameName>
+                <pointCloudCutoff>0.5</pointCloudCutoff>
+                <pointCloudCutoffMax>3.0</pointCloudCutoffMax>
+                <distortionK1>0</distortionK1>
+                <distortionK2>0</distortionK2>
+                <distortionK3>0</distortionK3>
+                <distortionT1>0</distortionT1>
+                <distortionT2>0</distortionT2>
+                <CxPrime>0</CxPrime>
+                <Cx>0</Cx>
+                <Cy>0</Cy>
+                <focalLength>0</focalLength>
+                <hackBaseline>0</hackBaseline>
             </plugin>
         </sensor>
     </gazebo>
