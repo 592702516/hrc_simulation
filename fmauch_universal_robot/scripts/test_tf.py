@@ -1,5 +1,7 @@
 import rospy
+import sys
 import actionlib
+import moveit_commander
 from trajectory_msgs.msg import JointTrajectory, JointTrajectoryPoint
 from control_msgs.msg import FollowJointTrajectoryAction, FollowJointTrajectoryGoal
 from std_msgs.msg import Float64
@@ -57,26 +59,72 @@ def send_gripper_command(controller_name, joint_names, positions, duration=2.0):
     else:
         rospy.logwarn(f'{controller_name} did not execute successfully.')
 
+def get_end_effector_position():
+    group = moveit_commander.MoveGroupCommander("ur5e")
+    current_pose = group.get_current_pose().pose
+    rospy.loginfo(f"End-Effector Position: x={current_pose.position.x}, y={current_pose.position.y}, z={current_pose.position.z}")
+    rospy.loginfo(f"End-Effector Orientation: x={current_pose.orientation.x}, y={current_pose.orientation.y}, z={current_pose.orientation.z}, w={current_pose.orientation.w}")
+    print(f"End-Effector Position: x={current_pose.position.x}, y={current_pose.position.y}, z={current_pose.position.z}")
+    print(f"End-Effector Orientation: x={current_pose.orientation.x}, y={current_pose.orientation.y}, z={current_pose.orientation.z}, w={current_pose.orientation.w}")
+
+def compute_inverse_kinematics(target_position):
+    group = moveit_commander.MoveGroupCommander("ur5e")
+    target_pose = group.get_current_pose().pose
+    target_pose.position.x = target_position[0]
+    target_pose.position.y = target_position[1]
+    target_pose.position.z = target_position[2]
+
+    # Set the pose target with increased tolerance
+    group.set_goal_position_tolerance(0.05)
+    group.set_goal_orientation_tolerance(0.1)
+    group.set_pose_target(target_pose)
+
+    # Plan the trajectory to the target pose
+    rospy.loginfo("Planning to target pose...")
+    success, plan, planning_time, error_code = group.plan()
+    rospy.loginfo(f"Planning result: success={success}, planning_time={planning_time}, error_code={error_code}")
+
+    if success and plan.joint_trajectory.points:
+        joint_positions = plan.joint_trajectory.points[-1].positions
+        rospy.loginfo(f"Computed joint positions: {joint_positions}")
+        print(f"Computed joint positions: {joint_positions}")
+        return joint_positions
+    else:
+        rospy.logwarn("No valid joint positions found for the given target position.")
+        return None
 
 def main():
     rospy.init_node('test_ur5e_gripper_controllers')
 
+    # Initialize MoveIt
+    moveit_commander.roscpp_initialize(sys.argv)
+    robot = moveit_commander.RobotCommander()
+    scene = moveit_commander.PlanningSceneInterface()
+    group = moveit_commander.MoveGroupCommander("ur5e")
+
     try:
-        # Testing UR5e arm controller
-        send_trajectory(
-            controller_name='ur5e_controller',
-            joint_names=[
-                'workbench_joint',
-                'shoulder_pan_joint',
-                'shoulder_lift_joint',
-                'elbow_joint',
-                'wrist_1_joint',
-                'wrist_2_joint',
-                'wrist_3_joint'
-            ],
-            positions=[0.4, 0.0, -1.6, -1.5, 4.7, 1.5708, 0.0],
-            duration=5.0
-        )
+        # Define the target world position
+        target_position = [-0.186217, 0, 1.1]
+
+        # Compute the joint positions for the given target world position
+        joint_positions = compute_inverse_kinematics(target_position)
+
+        if joint_positions:
+            # Move the robot to the computed joint positions
+            send_trajectory(
+                controller_name='ur5e_controller',
+                joint_names=[
+                    'workbench_joint',
+                    'shoulder_pan_joint',
+                    'shoulder_lift_joint',
+                    'elbow_joint',
+                    'wrist_1_joint',
+                    'wrist_2_joint',
+                    'wrist_3_joint'
+                ],
+                positions=joint_positions,
+                duration=5.0
+            )
 
         # Adding a delay before testing the gripper
         time.sleep(2)

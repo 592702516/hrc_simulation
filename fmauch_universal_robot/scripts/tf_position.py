@@ -1,5 +1,7 @@
 import rospy
+import sys
 import actionlib
+import moveit_commander
 from trajectory_msgs.msg import JointTrajectory, JointTrajectoryPoint
 from control_msgs.msg import FollowJointTrajectoryAction, FollowJointTrajectoryGoal
 from std_msgs.msg import Float64
@@ -57,26 +59,31 @@ def send_gripper_command(controller_name, joint_names, positions, duration=2.0):
     else:
         rospy.logwarn(f'{controller_name} did not execute successfully.')
 
+def get_end_effector_position():
+    group = moveit_commander.MoveGroupCommander("ur5e")
+    current_pose = group.get_current_pose().pose
+    rospy.loginfo(f"End-Effector Position: x={current_pose.position.x}, y={current_pose.position.y}, z={current_pose.position.z}")
+    rospy.loginfo(f"End-Effector Orientation: x={current_pose.orientation.x}, y={current_pose.orientation.y}, z={current_pose.orientation.z}, w={current_pose.orientation.w}")
+    print(f"End-Effector Position: x={current_pose.position.x}, y={current_pose.position.y}, z={current_pose.position.z}")
+    print(f"End-Effector Orientation: x={current_pose.orientation.x}, y={current_pose.orientation.y}, z={current_pose.orientation.z}, w={current_pose.orientation.w}")
 
 def main():
     rospy.init_node('test_ur5e_gripper_controllers')
 
+    # Initialize MoveIt
+    moveit_commander.roscpp_initialize(sys.argv)
+    robot = moveit_commander.RobotCommander()
+    scene = moveit_commander.PlanningSceneInterface()
+    group = moveit_commander.MoveGroupCommander("ur5e")
+
     try:
-        # Testing UR5e arm controller
-        send_trajectory(
-            controller_name='ur5e_controller',
-            joint_names=[
-                'workbench_joint',
-                'shoulder_pan_joint',
-                'shoulder_lift_joint',
-                'elbow_joint',
-                'wrist_1_joint',
-                'wrist_2_joint',
-                'wrist_3_joint'
-            ],
-            positions=[0.4, 0.0, -1.6, -1.5, 4.7, 1.5708, 0.0],
-            duration=5.0
-        )
+        # Set the joint positions directly
+        group.set_joint_value_target([0.4, 0.0, -1.6, -1.5, 4.7, 1.5708, 0.0])
+        plan = group.plan()
+        group.go(wait=True)
+
+        # Print the end-effector position after moving to the target joint positions
+        get_end_effector_position()
 
         # Adding a delay before testing the gripper
         time.sleep(2)
