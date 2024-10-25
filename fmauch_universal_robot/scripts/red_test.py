@@ -62,7 +62,7 @@ def main():
     rospy.init_node('red_cube_position_node')
 
     # Subscribe to the correct camera topic to detect the red cube
-    rospy.Subscriber('/azure_kinect_camera_1/image_raw', Image, image_callback)
+    rospy.Subscriber('/azure_kinect_camera_1/color/image_raw', Image, image_callback)
     rospy.Subscriber('/azure_kinect_camera_1/depth/points', PointCloud2, depth_callback)
 
     rospy.spin()

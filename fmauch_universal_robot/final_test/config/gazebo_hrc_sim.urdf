@@ -570,7 +570,7 @@
     </link>
     <!-- mount the camera to the robot -->
     <joint name="azure_kinect_fix_1" type="fixed">
-        <origin rpy="0 1.5707963267948966 0" xyz="0.5 0 1" />
+        <origin rpy="1.5707963267948966 1.5707963267948966 0" xyz="-0.5 0 1" />
         <parent link="world_camera" />
         <child link="camera_base_1" />
     </joint>
@@ -644,7 +644,7 @@
     <joint name="world_to_world_camera_joint" type="fixed">
         <parent link="world" />
         <child link="world_camera" />
-        <origin rpy="0 0 0" xyz="0.0 0.0 1.0" />
+        <origin rpy="0 0 3.1416" xyz="0.0 0.0 1.0" />
         <!-- Adjust the position as necessary -->
     </joint>
     <joint name="camera_base_1_to_body_1" type="fixed">

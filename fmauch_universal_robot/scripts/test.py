@@ -74,7 +74,7 @@ def main():
                 'wrist_2_joint',
                 'wrist_3_joint'
             ],
-            positions=[0.4, 0.0, -1.6, -1.5, 4.7, 1.5708, 0.0],
+            positions=[0.4, 0.0, -1.6, -1.5, 4.67, 1.5708, 0.0],
             duration=5.0
         )
 
