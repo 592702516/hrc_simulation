@@ -1,3 +1,4 @@
+# test the coordinate translate
 import rospy
 import sys
 import actionlib
@@ -104,7 +105,7 @@ def main():
 
     try:
         # Define the target world position
-        target_position = [0.5853493372599283, 0.12705412705739338, 1.1183727741241455]
+        target_position = [0.1356812460081918, 0.4054105384009225, 1.0500242456436157]
 
         # Compute the joint positions for the given target world position
         joint_positions = compute_inverse_kinematics(target_position)
