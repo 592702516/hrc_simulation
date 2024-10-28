@@ -14,6 +14,7 @@ import numpy as np
 import tf2_ros
 import tf2_geometry_msgs
 from geometry_msgs.msg import PointStamped
+from moveit_msgs.msg import OrientationConstraint, Constraints
 
 bridge = CvBridge()
 depth_image = None
@@ -70,25 +71,50 @@ def send_gripper_command(controller_name, joint_names, positions, duration=2.0):
 
 def compute_inverse_kinematics(target_position):
     group = moveit_commander.MoveGroupCommander("ur5e")
+    
+    # Set the target pose with the desired position
     target_pose = group.get_current_pose().pose
     target_pose.position.x = target_position[0]
     target_pose.position.y = target_position[1]
     target_pose.position.z = target_position[2]
 
-    # Set the pose target with increased tolerance
-    group.set_goal_position_tolerance(0.05)
-    group.set_goal_orientation_tolerance(0.1)
+    # Define orientation to keep the wrist_2_link pointing down
+    target_pose.orientation.x = 0.0
+    target_pose.orientation.y = 1.0  # This depends on the desired downward pointing direction
+    target_pose.orientation.z = 0.0
+    target_pose.orientation.w = 0.0
+
+    # Set pose target with orientation
+    group.set_start_state_to_current_state()
+    group.set_start_state_to_current_state()
     group.set_pose_target(target_pose)
 
-    # Plan the trajectory to the target pose
-    rospy.loginfo("Planning to target pose...")
+    # Create an orientation constraint for the wrist to point down
+    ocm = OrientationConstraint()
+    ocm.link_name = "wrist_2_link"
+    ocm.header.frame_id = "base_link"
+    ocm.orientation.y = 1.0  # Keep the orientation to point down
+    ocm.absolute_x_axis_tolerance = 0.3
+    ocm.absolute_y_axis_tolerance = 0.3
+    ocm.absolute_z_axis_tolerance = 0.3
+    ocm.weight = 1.0
+
+    # Set the constraint in MoveIt
+    constraints = Constraints()
+    constraints.orientation_constraints.append(ocm)
+    group.set_path_constraints(constraints)
+
+    # Plan the trajectory
+    rospy.loginfo("Planning to target pose with orientation constraint...")
     success, plan, planning_time, error_code = group.plan()
     rospy.loginfo(f"Planning result: success={success}, planning_time={planning_time}, error_code={error_code}")
+
+    # Clear the path constraints after planning
+    group.clear_path_constraints()
 
     if success and plan.joint_trajectory.points:
         joint_positions = plan.joint_trajectory.points[-1].positions
         rospy.loginfo(f"Computed joint positions: {joint_positions}")
-        print(f"Computed joint positions: {joint_positions}")
         return joint_positions
     else:
         rospy.logwarn("No valid joint positions found for the given target position.")
