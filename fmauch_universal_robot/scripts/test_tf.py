@@ -1,4 +1,3 @@
-# test the coordinate translate
 import rospy
 import sys
 import actionlib
@@ -97,17 +96,13 @@ def compute_inverse_kinematics(target_position):
 def main():
     rospy.init_node('test_ur5e_gripper_controllers')
 
-    # Initialize MoveIt
     moveit_commander.roscpp_initialize(sys.argv)
     robot = moveit_commander.RobotCommander()
     scene = moveit_commander.PlanningSceneInterface()
     group = moveit_commander.MoveGroupCommander("ur5e")
 
     try:
-        # Define the target world position
-        target_position = [0.1356812460081918, 0.4054105384009225, 1.0500242456436157]
-
-        # Compute the joint positions for the given target world position
+        target_position = [0.2,0.2,1.5]
         joint_positions = compute_inverse_kinematics(target_position)
 
         if joint_positions:
@@ -124,30 +119,33 @@ def main():
                     'wrist_3_joint'
                 ],
                 positions=joint_positions,
-                duration=5.0
+                duration=2.0
             )
 
-        # Adding a delay before testing the gripper
-        time.sleep(2)
+            # Adding a delay before testing the gripper
+            time.sleep(2)
+        
 
-        # Testing Gripper controller using action client
-        send_gripper_command(
-            controller_name='gripper_controller',
-            joint_names=['gripper_finger1_joint'],
-            positions=[0.5],  # Assuming the gripper is closing to 3.1415(pi) position
-            duration=3.0
-        )
-        time.sleep(2)
-        # Testing Gripper controller using action client
-        send_gripper_command(
-            controller_name='gripper_controller',
-            joint_names=['gripper_finger1_joint'],
-            positions=[0],  # Assuming the gripper is closing to 3.1415(pi) position
-            duration=3.0
-        )
+            # Close the gripper to pick up the cube
+            send_gripper_command(
+                controller_name='gripper_controller',
+                joint_names=['gripper_finger1_joint'],
+                positions=[0.4],  # Assuming the gripper is closing
+                duration=1.0
+            )
+                       
+            # Testing Gripper controller using action client
+            time.sleep(1)
+            send_gripper_command(
+                controller_name='gripper_controller',
+                joint_names=['gripper_finger1_joint'],
+                positions=[0],  # Assuming the gripper is opening
+                duration=1.0
+            )
 
     except rospy.ROSInterruptException:
         rospy.logerr('Interrupted during execution')
 
 if __name__ == '__main__':
     main()
+
