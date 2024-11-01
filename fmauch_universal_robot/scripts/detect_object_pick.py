@@ -177,10 +177,10 @@ def main():
             controller_name='gripper_controller',
             joint_names=['gripper_finger1_joint'],
             positions=[0.4],
-            duration=1.0
+            duration=0.5
         )
 
-        rospy.sleep(1)
+        rospy.sleep(0.5)
 
         # 抓取后抬高
         target_position[2] += 0.3
@@ -190,6 +190,12 @@ def main():
         move_cartesian_path(group, waypoints)
 
         rospy.sleep(0.5)
+
+        target_pose.position.x = 0.5
+        target_pose.position.y = 0.0
+        target_pose.position.z = 1.2
+        waypoints = [target_pose]
+        move_cartesian_path(group, waypoints)
 
         # 打开夹爪
         send_gripper_command(
