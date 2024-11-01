@@ -108,32 +108,23 @@ def image_callback(msg):
                 position_logged = True
 
 def move_cartesian_path(group, waypoints, time_increment=1.0):
-    # 确保 waypoints 是 geometry_msgs/Pose 类型的列表
-    if not all(isinstance(waypoint, Pose) for waypoint in waypoints):
-        rospy.logerr("所有 waypoints 的元素必须是 Pose 类型。")
-        return False
-
     # 设置规划器和规划时间
-    group.set_planner_id("RRTconnect")  # 使用 RRTstar 规划器
-    group.set_planning_time(3)    # 设置规划时间为 10 秒
+    group.set_planner_id("RRTConnectConfigDefault")  # 使用 RRTstar 规划器
+    group.set_planning_time(10)    # 设置规划时间为 10 秒
 
     # 规划笛卡尔路径，增加步长来减少路径点数量
     (plan, fraction) = group.compute_cartesian_path(
         waypoints,            # 要跟随的 Pose 对象列表
-        eef_step=0.1,
-        avoid_collisions=False # 末端执行器的步长，单位为米
+        eef_step=0.05,
+        avoid_collisions=False, # 末端执行器的步长，单位为米
     )
-    
+        
     # 检查规划的成功率
-    if fraction > 0.9:
+    if fraction == 1.0:
         rospy.loginfo(f"cartesian path planning success: {fraction}")
 
-        # 更新每个点的时间戳，确保 time_from_start 严格递增，增加时间跨度减少抖动
-        for idx, point in enumerate(plan.joint_trajectory.points):
-            point.time_from_start = rospy.Duration((idx + 1) * time_increment)
-
         # 执行轨迹
-        result = group.execute(plan, wait=True)
+        result = group.execute(plan)
 
     else:
         rospy.logwarn(f"cartesian path planning unsucces: {fraction}")
@@ -147,8 +138,9 @@ def main():
     scene = moveit_commander.PlanningSceneInterface()
     group = moveit_commander.MoveGroupCommander("ur5e")
 
-    group.set_max_velocity_scaling_factor(1)
-    group.set_max_acceleration_scaling_factor(1)
+    group.set_max_velocity_scaling_factor(0.5)
+    group.set_max_acceleration_scaling_factor(0.5)
+
 
     rospy.Subscriber('/azure_kinect_camera_1/color/image_raw', Image, image_callback)
     rospy.Subscriber('/azure_kinect_camera_1/depth/image_raw', Image, depth_callback)
@@ -161,22 +153,20 @@ def main():
         # 移动到目标位置上方
         target_position[2] += 0.15
 
-        current_pose = group.get_current_pose().pose
         target_pose = Pose()
         target_pose.position.x = target_position[0]
         target_pose.position.y = target_position[1]
         target_pose.position.z = target_position[2]
-        target_pose.orientation = current_pose.orientation
+        target_pose.orientation = group.get_current_pose().pose.orientation  # 保持当前姿态
 
-        waypoints = [current_pose, target_pose]
+        waypoints = [target_pose]
         move_cartesian_path(group, waypoints)
-
         rospy.sleep(0.5)
 
         # 向下移动以抓取
         target_position[2] -= 0.15
         target_pose.position.z = target_position[2]
-        waypoints = [group.get_current_pose().pose, target_pose]
+        waypoints = [target_pose]
 
         move_cartesian_path(group, waypoints)
 
@@ -195,7 +185,7 @@ def main():
         # 抓取后抬高
         target_position[2] += 0.3
         target_pose.position.z = target_position[2]
-        waypoints = [group.get_current_pose().pose, target_pose]
+        waypoints = [target_pose]
 
         move_cartesian_path(group, waypoints)
 
@@ -210,7 +200,7 @@ def main():
         )
 
     except rospy.ROSInterruptException:
-        rospy.logerr('执行过程中断')
+        rospy.logerr('stop')
 
 if __name__ == '__main__':
     main()
