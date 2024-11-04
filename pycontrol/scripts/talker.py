@@ -9,10 +9,10 @@ from math import *
 def get_goal():
     goal = JointTrajectoryControllerState()
     goal.header = Header()
-    goal.joint_names = ['shoulder_pan_joint', 'shoulder_lift_joint', 'elbow_joint', 'wrist_1_joint', 'wrist_2_joint', 'wrist_3_joint']
+    goal.joint_names = ['shoulder_pan_joint', 'shoulder_lift_joint', 'elbow_joint', 'wrist_1_joint', 'wrist_2_joint', 'wrist_3_joint', 'workbench_joint']
     goal.header.stamp = rospy.Time.now()
-    goal.desired.positions = [0.50, -0.55, -2.6, -1.57, 1.58, 0.0]
-    goal.desired.velocities = [0.1, 0, 0, 0, 0, 0]
+    goal.desired.positions = [0.50, -0.55, -2.6, -1.57, 1.58, 0.0, 0.4]
+    goal.desired.velocities = [0.1, 0, 0, 0, 0, 0, 0]
     goal.desired.time_from_start = rospy.Duration(2.0)
     return goal
 

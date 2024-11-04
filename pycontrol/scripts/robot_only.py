@@ -22,14 +22,12 @@ if __name__ == "__main__":
     angle = 1.571
     try:
         while True:
-            pose_list =[]
-            pose_list.append([0.0, -angle, 0.0, -angle, angle, 0.0])
+            pose_list = [0.4, 0.0, -angle, 0.0, -angle, angle, 0.0]s
             robot.execute_joint_trajectory(pose_list)
 
             time.sleep(1)
 
-            rot_list =[]
-            rot_list.append([0.0, -angle, 0.0, -angle, 0.0, 0.0])
+            rot_list = [0.4, 0.0, -angle, 0.0, -angle, 0.0, 0.0]
             robot.execute_joint_trajectory(rot_list)
 
             time.sleep(1)
