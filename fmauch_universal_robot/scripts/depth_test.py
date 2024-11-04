@@ -1,4 +1,6 @@
+#!/usr/bin/env python
 # test the depth data 
+# 
 import rospy
 from sensor_msgs.msg import Image, CameraInfo
 from cv_bridge import CvBridge, CvBridgeError

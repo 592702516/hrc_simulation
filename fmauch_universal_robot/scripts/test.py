@@ -10,11 +10,22 @@ from cv_bridge import CvBridge
 import cv2
 import numpy as np
 
-def send_trajectory(controller_name, joint_names, positions, duration=5.0):
-    client = actionlib.SimpleActionClient(f'/{controller_name}/follow_joint_trajectory', FollowJointTrajectoryAction)
-    rospy.loginfo(f'Waiting for {controller_name} action server...')
+def execute_joint_trajectory(positions):
+    controller_name='ur5e_controller'
+    joint_names=[
+                'workbench_joint',
+                'shoulder_pan_joint',
+                'shoulder_lift_joint',
+                'elbow_joint',
+                'wrist_1_joint',
+                'wrist_2_joint',
+                'wrist_3_joint'
+            ]
+    duration=5.0
+    client = actionlib.SimpleActionClient(f'/ur5e_controller/follow_joint_trajectory', FollowJointTrajectoryAction)
+    rospy.loginfo('Waiting for ur5e_controller action server...')
     client.wait_for_server()
-    rospy.loginfo(f'{controller_name} action server is up. Sending trajectory...')
+    rospy.loginfo('ur5e_controller action server is up. Sending trajectory...')
 
     goal = FollowJointTrajectoryGoal()
     goal.trajectory.joint_names = joint_names
@@ -30,9 +41,9 @@ def send_trajectory(controller_name, joint_names, positions, duration=5.0):
     client.wait_for_result()
 
     if client.get_result():
-        rospy.loginfo(f'{controller_name} executed successfully.')
+        rospy.loginfo('ur5e_controller executed successfully.')
     else:
-        rospy.logwarn(f'{controller_name} did not execute successfully.')
+        rospy.logwarn('ur5e_controller did not execute successfully.')
 
 def send_gripper_command(controller_name, joint_names, positions, duration=2.0):
     client = actionlib.SimpleActionClient(f'/{controller_name}/follow_joint_trajectory', FollowJointTrajectoryAction)
@@ -64,19 +75,8 @@ def main():
 
     try:
         # Testing UR5e arm controller
-        send_trajectory(
-            controller_name='ur5e_controller',
-            joint_names=[
-                'workbench_joint',
-                'shoulder_pan_joint',
-                'shoulder_lift_joint',
-                'elbow_joint',
-                'wrist_1_joint',
-                'wrist_2_joint',
-                'wrist_3_joint'
-            ],
+        execute_joint_trajectory(
             positions=[0.4, 0.0, -1.6, -1.5, 4.67, 1.5708, 0.0],
-            duration=5.0
         )
 
         # Adding a delay before testing the gripper
