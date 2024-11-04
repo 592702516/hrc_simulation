@@ -1,3 +1,8 @@
+#!/usr/bin/env python
+#
+# \author  Rui Zhou rzho774@aucklanduni.ac.nz
+# \date    2024-11-01
+# \detect the red cube, pick it up and place it.
 import rospy
 import sys
 import actionlib
@@ -115,7 +120,7 @@ def move_cartesian_path(group, waypoints, time_increment=1.0):
     # 规划笛卡尔路径，增加步长来减少路径点数量
     (plan, fraction) = group.compute_cartesian_path(
         waypoints,            # 要跟随的 Pose 对象列表
-        eef_step=0.05,
+        eef_step=0.02,
         avoid_collisions=False, # 末端执行器的步长，单位为米
     )
         

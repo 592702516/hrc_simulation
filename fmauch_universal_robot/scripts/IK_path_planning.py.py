@@ -1,4 +1,8 @@
-# pick test
+#!/usr/bin/env python
+#
+# \author  Rui Zhou rzho774@aucklanduni.ac.nz
+# \date    2024-11-01
+# \detect red cube and pick it up use IK path planning
 import rospy
 import sys
 import actionlib
@@ -18,6 +22,7 @@ from geometry_msgs.msg import PointStamped
 bridge = CvBridge()
 depth_image = None
 target_position = None  # Initialize target_position globally
+position_logged = False  # Flag to track if the red cube's position has been logged
 
 def send_trajectory(controller_name, joint_names, positions, duration=5.0):
     client = actionlib.SimpleActionClient(f'/{controller_name}/follow_joint_trajectory', FollowJointTrajectoryAction)
@@ -102,7 +107,6 @@ def depth_callback(msg):
         rospy.logerr("CvBridge 错误: {0}".format(e))
 
 def pixel_to_world(x, y):
-    global depth_image
     if depth_image is None:
         rospy.logwarn("深度数据尚未可用。")
         return None, None, None
@@ -127,14 +131,17 @@ def pixel_to_world(x, y):
     camera_z = depth_value
 
     # Transform the camera coordinates to world coordinates based on the fixed camera position
-    world_x = camera_x + 0.5  # Camera position in the world frame (x = 0.5 m)
-    world_y = camera_y
-    world_z = camera_z   # Camera height in the world frame (z = 2.0 m)
+    world_x = - camera_y + 0.5  # Camera position in the world frame (x = 0.5 m)
+    world_y = - camera_x
+    world_z = 2.0684 - camera_z   # Camera height in the world frame (z = 2.0 m)
 
     return world_x, world_y, world_z
 
 def image_callback(msg):
-    global target_position  # Make target_position global to use in main()
+    global target_position, position_logged  # Make target_position global to use in main(), and track if position is logged
+    if position_logged:
+        return  # Exit the callback if the position has already been logged
+
     try:
         # Convert ROS Image message to OpenCV format
         cv_image = bridge.imgmsg_to_cv2(msg, desired_encoding='bgr8')
@@ -162,6 +169,7 @@ def image_callback(msg):
             if real_world_x is not None:
                 rospy.loginfo(f"红色立方体的实际世界坐标: ({real_world_x}, {real_world_y}, {real_world_z})")
                 target_position = [real_world_x, real_world_y, real_world_z + 0.1]  # Adjust to 10cm above the detected position
+                position_logged = True  # Set the flag to True after logging the position
 
 def main():
     rospy.init_node('test_ur5e_gripper_controllers')
@@ -177,11 +185,12 @@ def main():
 
     try:
         # Wait for the red cube position to be detected
-        rospy.sleep(2)
+        rospy.sleep(1)
         while target_position is None:
-            rospy.sleep(1)
+            rospy.sleep(0.5)
 
         # Compute the joint positions for the given target world position
+        target_position[2] += 0.15
         joint_positions = compute_inverse_kinematics(target_position)
 
         if joint_positions:
@@ -198,27 +207,77 @@ def main():
                     'wrist_3_joint'
                 ],
                 positions=joint_positions,
-                duration=5.0
+                duration=2.0
             )
 
-        # Adding a delay before testing the gripper
-        time.sleep(2)
+            # Adding a delay before testing the gripper
+            time.sleep(2)
+        
+        target_position[2] -= 0.15
+        joint_positions = compute_inverse_kinematics(target_position)
 
-        # Testing Gripper controller using action client
-        send_gripper_command(
-            controller_name='gripper_controller',
-            joint_names=['gripper_finger1_joint'],
-            positions=[0.5],  # Assuming the gripper is closing
-            duration=3.0
-        )
-        time.sleep(2)
-        # Testing Gripper controller using action client
-        send_gripper_command(
-            controller_name='gripper_controller',
-            joint_names=['gripper_finger1_joint'],
-            positions=[0],  # Assuming the gripper is opening
-            duration=3.0
-        )
+        if joint_positions:
+            # Move the robot to the computed joint positions
+            send_trajectory(
+                controller_name='ur5e_controller',
+                joint_names=[
+                    'workbench_joint',
+                    'shoulder_pan_joint',
+                    'shoulder_lift_joint',
+                    'elbow_joint',
+                    'wrist_1_joint',
+                    'wrist_2_joint',
+                    'wrist_3_joint'
+                ],
+                positions=joint_positions,
+                duration=2.0
+            )
+
+            # Adding a delay before testing the gripper
+            time.sleep(2)
+
+            # Close the gripper to pick up the cube
+            send_gripper_command(
+                controller_name='gripper_controller',
+                joint_names=['gripper_finger1_joint'],
+                positions=[0.4],  # Assuming the gripper is closing
+                duration=1.0
+            )
+
+            # Adding a delay before lifting the arm
+            time.sleep(1)
+                       
+            # Update target position to move up by 0.3m
+            target_position[2] += 0.3
+
+            # Compute joint positions for the new target position (lift up)
+            joint_positions_up = compute_inverse_kinematics(target_position)
+
+            if joint_positions_up:
+                # Move the robot arm up by 0.3m
+                send_trajectory(
+                    controller_name='ur5e_controller',
+                    joint_names=[
+                        'workbench_joint',
+                        'shoulder_pan_joint',
+                        'shoulder_lift_joint',
+                        'elbow_joint',
+                        'wrist_1_joint',
+                        'wrist_2_joint',
+                        'wrist_3_joint'
+                    ],
+                    positions=joint_positions_up,
+                    duration=2.0
+                )
+            # Testing Gripper controller using action client
+            
+            time.sleep(2)
+            send_gripper_command(
+                controller_name='gripper_controller',
+                joint_names=['gripper_finger1_joint'],
+                positions=[0],  # Assuming the gripper is opening
+                duration=1.0
+            )
 
     except rospy.ROSInterruptException:
         rospy.logerr('Interrupted during execution')

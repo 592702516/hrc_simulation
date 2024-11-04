@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-
+# auto photo when detect the red
 import rospy
 import cv2
 from cv_bridge import CvBridge

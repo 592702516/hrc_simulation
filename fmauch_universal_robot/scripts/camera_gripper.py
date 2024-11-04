@@ -1,3 +1,4 @@
+#  test the gripper and depth camera
 import rospy
 import actionlib
 import time

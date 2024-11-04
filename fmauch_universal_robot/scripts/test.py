@@ -1,4 +1,4 @@
-# set the trajectory to the joints
+# send the trajectory to the joints
 import rospy
 import actionlib
 from trajectory_msgs.msg import JointTrajectory, JointTrajectoryPoint

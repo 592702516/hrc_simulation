@@ -1,3 +1,4 @@
+# detect the red cube
 import rospy
 import cv2
 import numpy as np
@@ -44,8 +45,8 @@ def pixel_to_world(x, y):
     camera_z = depth_value
 
     # Transform the camera coordinates to world coordinates based on the fixed camera position
-    world_x =  - camera_y + 0.5  # Camera position in the world frame (x = 0.5 m)
-    world_y =  - camera_x  
+    world_x = - camera_y + 0.5  # Camera position in the world frame (x = 0.5 m)
+    world_y = - camera_x  
     world_z = 2.0684 - camera_z   # Camera height in the world frame (z = 2.0 m)
 
     return world_x, world_y, world_z
