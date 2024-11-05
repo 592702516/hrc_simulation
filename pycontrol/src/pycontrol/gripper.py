@@ -9,14 +9,13 @@ class Robotiq85Gripper:
 
         self._gripper_stat = JointTrajectoryControllerState()
         self._r = rospy.Rate(1)
-        self.open()
 
     def _update_gripper_stat(self, stat):
         self._gripper_stat = stat
 
     def close(self):
         trajectory = JointTrajectory()
-        trajectory.joint_names = ['gripper_finger1_joint']  # 修改为 URDF 或控制器中定义的实际关节名称
+        trajectory.joint_names = ['gripper_finger1_joint']  
         point = JointTrajectoryPoint()
         point.positions = [0.5]  # close
         point.time_from_start = rospy.Duration(2.0)  # time for excuse
@@ -24,7 +23,7 @@ class Robotiq85Gripper:
         trajectory.points.append(point)
         trajectory.header.stamp = rospy.Time.now()
         self._gripper_pub.publish(trajectory)
-        rospy.loginfo('关闭命令已发送。')
+        rospy.loginfo('close')
         return True
 
     def open(self):
@@ -37,7 +36,7 @@ class Robotiq85Gripper:
         trajectory.points.append(point)
         trajectory.header.stamp = rospy.Time.now()
         self._gripper_pub.publish(trajectory)
-        rospy.loginfo('打开命令已发送。')
+        rospy.loginfo('open')
         return True
 
     def get_stat(self):
