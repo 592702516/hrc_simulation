@@ -46,6 +46,7 @@ if __name__ == "__main__":
     rospy.init_node("combined_control")
     robot = UR5eRobot()
     gripper = Robotiq85Gripper()
+    camera = AzureKinectCamera()
 
     signal.signal(signal.SIGINT, sig_handler)
 
@@ -58,13 +59,12 @@ if __name__ == "__main__":
     while True:
         # turn over to conveyor side
         pose_list = []
-        conveyor = 0.4
-        pose_list.append([conveyor, 0.483, -0.189, 0.506, 2.226, -2.217, 0.0])
-        robot.execute_joint_trajectory(pose_list)
+        pose_list.append([0.483, -0.189, 0.506, 2.226, -2.217, 0.0])
+        robot.execute_cartesian_trajectory(pose_list)
 
         over_list =[]
-        over_list.append([conveyor, 0.483, -0.189, 0.130, 2.226, -2.217, 0.0])
-        robot.execute_joint_trajectory(over_list)
+        over_list.append([0.483, -0.189, 0.130, 2.226, -2.217, 0.0])
+        robot.execute_cartesian_trajectory(over_list)
         
         # close gripper
         close_gripper(gripper)
@@ -72,15 +72,15 @@ if __name__ == "__main__":
 
         # turn over to conveyor side
         pose_list = []
-        pose_list.append([conveyor, 0.483, -0.189, 0.506, 2.226, -2.217, 0.0])
-        pose_list.append([conveyor, 0.478, -0.180, 0.710, 2.338, -2.368, 2.535])
-        pose_list.append([conveyor, 0.355, 0.136, 0.812, 4.62, -0.788, 2.145])
-        robot.execute_joint_trajectory(pose_list)
+        pose_list.append([0.483, -0.189, 0.506, 2.226, -2.217, 0.0])
+        pose_list.append([0.478, -0.180, 0.710, 2.338, -2.368, 2.535])
+        pose_list.append([0.355, 0.136, 0.812, 4.62, -0.788, 2.145])
+        robot.execute_cartesian_trajectory(pose_list)
         robot.go_home()
 
         over_list =[]
-        over_list.append([conveyor, 0.483, -0.189, 0.130, 2.226, -2.217, 0.0])
-        robot.execute_joint_trajectory(over_list)
+        over_list.append([0.483, -0.189, 0.130, 2.226, -2.217, 0.0])
+        robot.execute_cartesian_trajectory(over_list)
 
         # open gripper
         open_gripper(gripper)
