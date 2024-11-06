@@ -1,4 +1,4 @@
-import sys
+
 import time
 import rospy
 import numpy as np

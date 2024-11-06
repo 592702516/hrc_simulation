@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 #!\file
 #
-# \author  Wanqing Xia wxia612@aucklanduni.ac.nz
-# \date    2022-07-22
+# \author  Rui Zhou rzho774@aucklanduni.ac.nz
+# \date    2024-11-02
 #
 #
 # ---------------------------------------------------------------------
@@ -50,7 +50,6 @@ if __name__ == "__main__":
     rospy.init_node("combined_control")
     robot = UR5eRobot()
     gripper = Robotiq85Gripper()
-    # sensor = FT300Sensor()
     camera = AzureKinectCamera()
 
     signal.signal(signal.SIGINT, sig_handler)

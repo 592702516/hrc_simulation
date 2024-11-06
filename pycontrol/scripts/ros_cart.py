@@ -12,11 +12,8 @@ import time
 import rospy
 import numpy as np
 import signal
-
 from pycontrol.gripper import Robotiq85Gripper
-
 from pycontrol.robot import UR5eRobot
-
 from pycontrol.camera import AzureKinectCamera
 
 def sig_handler(signal, frame):

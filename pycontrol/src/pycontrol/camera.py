@@ -1,6 +1,9 @@
 import rospy
 from sensor_msgs.msg import Image
 from cv_bridge import CvBridge, CvBridgeError
+# import sys
+# import time
+from yolo_msgs.msg import yolo
 
 class AzureKinectCamera:
     def __init__(self):
@@ -9,6 +12,15 @@ class AzureKinectCamera:
         self._latest_depth = None
         rospy.Subscriber("/azure_kinect_camera_1/color/image_raw", Image, self._update_image, queue_size=10)
         rospy.Subscriber("/azure_kinect_camera_1/depth/image_raw", Image, self._update_depth, queue_size=10)
+    #     self.listener = rospy.Subscriber("/yolov5", yolo, self._update_object_stat, queue_size=10)
+    #     self._detect = yolo()
+
+    # def _update_object_stat(self, stat):
+    #     self._detect = stat
+    
+    # def get_detect(self):
+    #     return self._detect
+    
 
     def _update_image(self, data):
         try:
