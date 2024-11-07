@@ -3,6 +3,7 @@
 # \author  Rui Zhou rzho774@aucklanduni.ac.nz
 # \date    2024-11-01
 # \detect the red cube, pick it up and place it.
+
 import rospy
 import sys
 import actionlib
@@ -87,7 +88,6 @@ def image_callback(msg):
     global target_position, position_logged
     if position_logged:
         return
-
     try:
         cv_image = bridge.imgmsg_to_cv2(msg, desired_encoding='bgr8')
     except CvBridgeError as e:
@@ -112,23 +112,23 @@ def image_callback(msg):
                 target_position = [real_world_x, real_world_y, real_world_z + 0.12]
                 position_logged = True
 
-def move_cartesian_path(group, waypoints, time_increment=1.0):
-    # 设置规划器和规划时间
-    group.set_planner_id("RRTConnectConfigDefault")  # 使用 RRTstar 规划器
-    group.set_planning_time(10)    # 设置规划时间为 10 秒
+def execute_cartesian_trajectory(group, waypoints, time_increment=1.0):
+    # setting pannner and planning time 
+    group.set_planner_id("RRTConnectConfigDefault")  
+    group.set_planning_time(10)    
 
-    # 规划笛卡尔路径，增加步长来减少路径点数量
+    # plan cartesian path planning 
     (plan, fraction) = group.compute_cartesian_path(
-        waypoints,            # 要跟随的 Pose 对象列表
+        waypoints,           
         eef_step=0.02,
-        avoid_collisions=False, # 末端执行器的步长，单位为米
+        avoid_collisions=False, 
     )
         
-    # 检查规划的成功率
+    # check the success rate
     if fraction == 1.0:
         rospy.loginfo(f"cartesian path planning success: {fraction}")
 
-        # 执行轨迹
+        # execute the cartesian path
         result = group.execute(plan)
 
     else:
@@ -155,7 +155,7 @@ def main():
         while target_position is None or depth_image is None:
             rospy.sleep(0.5)
 
-        # 移动到目标位置上方
+        # move below the target object 
         target_position[2] += 0.15
 
         target_pose = Pose()
@@ -165,19 +165,20 @@ def main():
         target_pose.orientation = group.get_current_pose().pose.orientation  # 保持当前姿态
 
         waypoints = [target_pose]
-        move_cartesian_path(group, waypoints)
+        rospy.loginfo(waypoints)
+        execute_cartesian_trajectory(group, waypoints)
         rospy.sleep(0.5)
 
-        # 向下移动以抓取
+        # down to pick the object up
         target_position[2] -= 0.15
         target_pose.position.z = target_position[2]
         waypoints = [target_pose]
 
-        move_cartesian_path(group, waypoints)
+        execute_cartesian_trajectory(group, waypoints)
 
         rospy.sleep(0.5)
 
-        # 关闭夹爪
+        # close the gripper
         send_gripper_command(
             controller_name='gripper_controller',
             joint_names=['gripper_finger1_joint'],
@@ -187,12 +188,12 @@ def main():
 
         rospy.sleep(0.5)
 
-        # 抓取后抬高
+        # place to the orginal position
         target_position[2] += 0.3
         target_pose.position.z = target_position[2]
         waypoints = [target_pose]
 
-        move_cartesian_path(group, waypoints)
+        execute_cartesian_trajectory(group, waypoints)
 
         rospy.sleep(0.5)
 
@@ -200,9 +201,9 @@ def main():
         target_pose.position.y = 0.0
         target_pose.position.z = 1.2
         waypoints = [target_pose]
-        move_cartesian_path(group, waypoints)
+        execute_cartesian_trajectory(group, waypoints)
 
-        # 打开夹爪
+        # open the gripper
         send_gripper_command(
             controller_name='gripper_controller',
             joint_names=['gripper_finger1_joint'],

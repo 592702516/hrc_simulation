@@ -24,14 +24,27 @@ depth_image = None
 target_position = None  # Initialize target_position globally
 position_logged = False  # Flag to track if the red cube's position has been logged
 
-def send_trajectory(controller_name, joint_names, positions, duration=5.0):
+
+def execute_joint_trajectory(positions):
+    controller_name='ur5e_controller'
+    JOINT_NAMES=[
+                'workbench_joint',
+                'shoulder_pan_joint',
+                'shoulder_lift_joint',
+                'elbow_joint',
+                'wrist_1_joint',
+                'wrist_2_joint',
+                'wrist_3_joint'
+            ]
+    
+    duration=5.0
     client = actionlib.SimpleActionClient(f'/{controller_name}/follow_joint_trajectory', FollowJointTrajectoryAction)
     rospy.loginfo(f'Waiting for {controller_name} action server...')
     client.wait_for_server()
     rospy.loginfo(f'{controller_name} action server is up. Sending trajectory...')
 
     goal = FollowJointTrajectoryGoal()
-    goal.trajectory.joint_names = joint_names
+    goal.trajectory.joint_names = JOINT_NAMES
 
     point = JointTrajectoryPoint()
     point.positions = positions
@@ -195,19 +208,8 @@ def main():
 
         if joint_positions:
             # Move the robot to the computed joint positions
-            send_trajectory(
-                controller_name='ur5e_controller',
-                joint_names=[
-                    'workbench_joint',
-                    'shoulder_pan_joint',
-                    'shoulder_lift_joint',
-                    'elbow_joint',
-                    'wrist_1_joint',
-                    'wrist_2_joint',
-                    'wrist_3_joint'
-                ],
+            execute_joint_trajectory(
                 positions=joint_positions,
-                duration=2.0
             )
 
             # Adding a delay before testing the gripper
@@ -218,19 +220,8 @@ def main():
 
         if joint_positions:
             # Move the robot to the computed joint positions
-            send_trajectory(
-                controller_name='ur5e_controller',
-                joint_names=[
-                    'workbench_joint',
-                    'shoulder_pan_joint',
-                    'shoulder_lift_joint',
-                    'elbow_joint',
-                    'wrist_1_joint',
-                    'wrist_2_joint',
-                    'wrist_3_joint'
-                ],
-                positions=joint_positions,
-                duration=2.0
+            execute_joint_trajectory(
+                positions=joint_positions
             )
 
             # Adding a delay before testing the gripper
@@ -255,19 +246,8 @@ def main():
 
             if joint_positions_up:
                 # Move the robot arm up by 0.3m
-                send_trajectory(
-                    controller_name='ur5e_controller',
-                    joint_names=[
-                        'workbench_joint',
-                        'shoulder_pan_joint',
-                        'shoulder_lift_joint',
-                        'elbow_joint',
-                        'wrist_1_joint',
-                        'wrist_2_joint',
-                        'wrist_3_joint'
-                    ],
+                execute_joint_trajectory(
                     positions=joint_positions_up,
-                    duration=2.0
                 )
             # Testing Gripper controller using action client
             
