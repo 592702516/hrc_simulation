@@ -16,9 +16,7 @@ from sensor_msgs.msg import Image, CameraInfo
 from cv_bridge import CvBridge, CvBridgeError
 
 from pycontrol.gripper import Robotiq85Gripper
-# from pycontrol.sensor import FT300Sensor
 from pycontrol.robot import UR5eRobot
-from pycontrol.conveyor import ConveyorBelt
 from pycontrol.camera import AzureKinectCamera
 
 def sig_handler(signal, frame):
