@@ -61,10 +61,9 @@ class UR5eRobot:
             rospy.logerr("Action list is empty")
     
     def execute_cartesian_trajectory(self, pose_list):
-    # 设置规划器和规划时间
-        group = moveit_commander.MoveGroupCommander("ur5e")
-        group.set_planner_id("RRTConnectConfigDefault")  # 使用 RRTstar 规划器
-        group.set_planning_time(10)    # 设置规划时间为 10 
+        
+        group.set_planner_id("RRTConnectConfigDefault")  
+        group.set_planning_time(10)    
         if pose_list:  
             for i, pose in enumerate(pose_list):
                 if len(pose) == 6:
@@ -72,20 +71,19 @@ class UR5eRobot:
                     target_pose.position.x = pose[0]
                     target_pose.position.y = pose[1]
                     target_pose.position.z = pose[2]
-                    target_pose.orientation = group.get_current_pose().pose.orientation
-                    # target_pose.orientation.x = pose[3]
-                    # target_pose.orientation.y = pose[4]
-                    # target_pose.orientation.z = pose[5]
+                    target_pose.orientation.x = pose[3]
+                    target_pose.orientation.y = pose[4]
+                    target_pose.orientation.z = pose[5]
                     waypoints = [target_pose]
                     (plan, fraction) = group.compute_cartesian_path(
-                        waypoints,            # 要跟随的 Pose 对象列表
+                        waypoints,           
                         eef_step=0.02,
-                        avoid_collisions=False, # 末端执行器的步长，单位为米
+                        avoid_collisions=False, 
                     )       
-                    # 检查规划的成功率
+                    
                     if fraction == 1.0:
                         rospy.loginfo(f"cartesian path planning success: {fraction}")
-                    # 执行轨迹
+                    
                         result = group.execute(plan)
                     else:
                         rospy.logwarn(f"cartesian path planning unsucces: {fraction}")
