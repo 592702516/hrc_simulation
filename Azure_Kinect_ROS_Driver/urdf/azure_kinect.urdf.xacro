@@ -84,11 +84,7 @@
             <child link="camera_visor" />
             <origin xyz="0. 0. 0." rpy="0. 0. 0." />
         </joint>
-        
-    
-        
-                                   
 
-    </xacro:macro>  
+    </xacro:macro>
 
 </robot>

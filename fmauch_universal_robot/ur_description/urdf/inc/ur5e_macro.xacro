@@ -43,6 +43,5 @@
       safety_pos_margin="${safety_pos_margin}"
       safety_k_position="${safety_k_position}"
     />
-  </xacro:macro>  
-
+  </xacro:macro>
 </robot>

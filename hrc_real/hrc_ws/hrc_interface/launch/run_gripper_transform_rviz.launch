@@ -1,0 +1,30 @@
+
+
+<launch>
+
+    <!-- Include the first sub-launch file -->
+    <include file="/home/rui/352LAB/src/robotiq_85_gripper/robotiq_85_bringup/launch/robotiq_85.launch">
+    </include>
+
+        <!-- Include the first sub-launch file -->
+    <include file="/home/rui/352LAB/src/robotiq_ft_sensor/launch/ft_sensor.launch">
+    </include>
+
+        <!-- Static Transform from frame "base_link" to "sensor_link"
+    <node pkg="tf2_ros" type="static_transform_publisher" name="camera_to_bench" args="0.55 1.064 1.215 -0.70561137  0.70561572  0.04593066 -0.0459285 bench_frame depth_camera_link">
+    </node> -->
+
+    <node pkg="hrc_interface" type="camera_transform.py" name="camera_to_bench" output="screen">
+    <!-- If your node has parameters, include them here -->
+    <!-- <param name="your_param" value="your_value"/> -->
+    </node>
+
+
+
+    <!-- Static Transform from frame "base_link" to "camera_link" -->
+    <node pkg="tf2_ros" type="static_transform_publisher" name="ur5e_to_bench" args="-0.09 0.812 0.13 0 0 1 0.0000013 bench_frame base_link">
+    </node>
+
+
+
+</launch>

@@ -69,7 +69,7 @@
     <xacro:include filename="$(find azure_kinect_ros_driver)/urdf/azure_kinect_1.urdf.xacro" />
 
     <xacro:azure_kinect_1 prefix="${prefix}" parent="${prefix}world_camera" >
-        <origin xyz="0.5 0 1" rpy="0 ${pi/2} 0"/>
+        <origin xyz="0.5 0 1" rpy="${pi} ${pi/2} 0"/>
     </xacro:azure_kinect_1>
     
         <!-- Define camera_base_optical as a child, not a root link -->
@@ -87,9 +87,8 @@
         <material>Gazebo/Black</material>
 
         <sensor name="camera_1" type="depth">
-            <pose> 0 0 0 0 0 0 </pose>
-            <visualize>true</visualize>
-            <update_rate>10</update_rate>
+            <always_on>true</always_on>
+            <update_rate>20.0</update_rate>
             <camera>
                 <horizontal_fov>1.089</horizontal_fov>
                 <image>
@@ -102,11 +101,25 @@
                     <far>8.0</far>
                 </clip>
             </camera>
-            <plugin name="camera_controller_1" filename="libgazebo_ros_camera.so">
-                <frame_name>camera_base_optical_1</frame_name>
-                <cameraName>azure_kinect_camera_1</cameraName>
-                <min_depth>0.1</min_depth>
-                <max_depth>10</max_depth>
+            <plugin name="camera_controller_1" filename="libgazebo_ros_openni_kinect.so">
+
+                <baseline>0.1</baseline>
+		        <alwaysOn>true</alwaysOn>
+		        <updateRate>10</updateRate>
+		        <cameraName>azure_kinect_camera_1</cameraName>
+		        <imageTopicName>depth/image_raw</imageTopicName>
+		        <cameraInfoTopicName>depth/camera_info</cameraInfoTopicName>
+		        <depthImageTopicName>depth/image_raw</depthImageTopicName>
+		        <depthImageCameraInfoTopicName>depth/camera_info</depthImageCameraInfoTopicName>
+		        <pointCloudTopicName>depth/points</pointCloudTopicName>
+		        <frameName>camera_base_optical_1</frameName>
+		        <pointCloudCutoff>0.3</pointCloudCutoff>
+
+		        <distortion_k1>0.0</distortion_k1>
+		        <distortion_k2>0.0</distortion_k2>
+		        <distortion_k3>0.0</distortion_k3>
+		        <distortion_t1>0.0</distortion_t1>
+		        <distortion_t2>0.0</distortion_t2>
             </plugin>
         </sensor>
     </gazebo> 
@@ -131,7 +144,7 @@
     <gazebo reference="camera_base">
         <material>Gazebo/Black</material>
 
-        <sensor name="camera" type="depth">
+        <sensor type="depth" name="camera">
             <pose> 0 0 0 0 0 0 </pose>
             <visualize>true</visualize>
             <update_rate>10</update_rate>
@@ -147,11 +160,25 @@
                     <far>8.0</far>
                 </clip>
             </camera>
-            <plugin name="camera_controller" filename="libgazebo_ros_camera.so">
-                <frame_name>camera_base_optical</frame_name>
-                <cameraName>azure_kinect_camera</cameraName>
-                <min_depth>0.1</min_depth>
-                <max_depth>10</max_depth>
+            <plugin name="camera_controller" filename="libgazebo_ros_openni_kinect.so">
+
+                <baseline>0.1</baseline>
+		        <alwaysOn>true</alwaysOn>
+		        <updateRate>10</updateRate>
+		        <cameraName>azure_kinect_camera</cameraName>
+		        <imageTopicName>depth/image_raw</imageTopicName>
+		        <cameraInfoTopicName>depth/camera_info</cameraInfoTopicName>
+		        <depthImageTopicName>depth/image_raw</depthImageTopicName>
+		        <depthImageCameraInfoTopicName>depth/camera_info</depthImageCameraInfoTopicName>
+		        <pointCloudTopicName>depth/points</pointCloudTopicName>
+		        <frameName>camera_base_optical</frameName>
+		        <pointCloudCutoff>0.3</pointCloudCutoff>
+
+		        <distortion_k1>0.0</distortion_k1>
+		        <distortion_k2>0.0</distortion_k2>
+		        <distortion_k3>0.0</distortion_k3>
+		        <distortion_t1>0.0</distortion_t1>
+		        <distortion_t2>0.0</distortion_t2>
             </plugin>
         </sensor>
     </gazebo>         

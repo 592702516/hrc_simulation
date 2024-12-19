@@ -1,0 +1,29 @@
+<launch>
+    <!-- Include the first sub-launch file -->
+    <include file="/home/rui/352LAB/src/Universal_Robots_ROS_Driver/ur_robot_driver/launch/ur5e_bringup.launch">
+        <arg name="use_tool_communication" value="true"/>
+        <arg name="tool_voltage" value="24"/>
+        <arg name="tool_baud_rate" value="115200"/>
+        <arg name="tool_stop_bits" value="1"/>
+        <arg name="tool_rx_idle_chars" value="1.5"/>
+        <arg name="tool_tx_idle_chars" value="3.5"/>
+        <arg name="tool_device_name" value="/tmp/ttyUR"/>
+        <arg name="robot_ip" value="192.168.12.100"/>
+        <arg name="kinematics_config" value="$(env HOME)/my_robot_calibration.yaml"/>
+        <arg name="controllers" value="joint_state_controller speed_scaling_state_controller force_torque_sensor_controller joint_group_vel_controller"/>
+        <arg name="stopped_controllers" value="scaled_pos_joint_traj_controller"/>
+    </include>
+
+
+        <!-- Include the first sub-launch file -->
+    <include file="/home/rui/352LAB/src/Azure_Kinect_ROS_Driver/launch/driver.launch">
+
+        <arg name="depth_enabled" value="true"/>
+        <arg name="depth_mode" value="NFOV_2X2BINNED"/>
+        <arg name="color_enabled" value="true"/>
+        <arg name="color_resolution" value="720P"/>
+        <arg name="fps" value="15"/>
+        <arg name="body_tracking_enabled" value="true"/>
+        <arg name="body_tracking_smoothing_factor" value="0"/>
+    </include>
+</launch>

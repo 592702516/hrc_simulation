@@ -48,6 +48,7 @@ if __name__ == "__main__":
     gripper = Robotiq85Gripper()
     camera = AzureKinectCamera()
 
+
     signal.signal(signal.SIGINT, sig_handler)
 
     # send robot to home position

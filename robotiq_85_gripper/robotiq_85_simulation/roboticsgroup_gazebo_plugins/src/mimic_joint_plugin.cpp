@@ -25,7 +25,7 @@ OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISE
 #if GAZEBO_MAJOR_VERSION >= 8
 namespace math = ignition::math;
 #else
-namespace math = gazebo::math;
+namespace math = ignition::math;
 #endif
 
 namespace gazebo {
@@ -154,7 +154,7 @@ namespace gazebo {
 #if GAZEBO_MAJOR_VERSION >= 8
         static ros::Duration period(world_->Physics()->GetMaxStepSize());
 #else
-        static ros::Duration period(world_->GetPhysicsEngine()->GetMaxStepSize());
+        static ros::Duration period(world_->Physics()->GetMaxStepSize());
 #endif
 
         // Set mimic joint's angle based on joint's angle
@@ -162,8 +162,8 @@ namespace gazebo {
         double angle = joint_->Position(0) * multiplier_ + offset_;
         double a = mimic_joint_->Position(0);
 #else
-        double angle = joint_->GetAngle(0).Radian() * multiplier_ + offset_;
-        double a = mimic_joint_->GetAngle(0).Radian();
+        double angle = joint_->Position(0) * multiplier_ + offset_;
+        double a = mimic_joint_->Position(0);
 #endif
 
         if (fabs(angle - a) >= sensitiveness_) {

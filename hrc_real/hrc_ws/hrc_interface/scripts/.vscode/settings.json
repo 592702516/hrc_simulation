@@ -1,0 +1,12 @@
+{
+    "python.autoComplete.extraPaths": [
+        "/home/testbed/hrc/hrc_ws/devel/lib/python3/dist-packages",
+        "/home/testbed/HRC_robot/devel/lib/python3/dist-packages",
+        "/opt/ros/noetic/lib/python3/dist-packages"
+    ],
+    "python.analysis.extraPaths": [
+        "/home/testbed/hrc/hrc_ws/devel/lib/python3/dist-packages",
+        "/home/testbed/HRC_robot/devel/lib/python3/dist-packages",
+        "/opt/ros/noetic/lib/python3/dist-packages"
+    ]
+}

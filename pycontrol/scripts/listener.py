@@ -1,8 +1,15 @@
 #!/usr/bin/env python
+import imp
 import rospy
+from control_msgs.msg import JointTrajectoryControllerState
 
-from control_msgs.msg import FollowJointTrajectoryActionFeedback
-
+import geometry_msgs.msg as geometry_msgs
+from cartesian_control_msgs.msg import (
+    FollowCartesianTrajectoryAction,
+    FollowCartesianTrajectoryGoal,
+    CartesianTrajectoryPoint,
+    FollowCartesianTrajectoryActionFeedback,
+)
 
 def callback(data):
     rospy.loginfo(data.feedback.actual.pose)
@@ -16,9 +23,7 @@ def listener():
     # run simultaneously.
     rospy.init_node('listener', anonymous=True)
 
-    rospy.Subscriber("/ur5e_controller/follow_joint_trajectory/feedback", FollowJointTrajectoryActionFeedback
-, callback)
-
+    rospy.Subscriber("/forward_cartesian_traj_controller/follow_cartesian_trajectory/feedback", FollowCartesianTrajectoryActionFeedback, callback)
 
     # spin() simply keeps python from exiting until this node is stopped
     rospy.spin()

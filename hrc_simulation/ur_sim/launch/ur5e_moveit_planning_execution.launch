@@ -1,0 +1,10 @@
+<launch>
+  <arg name="sim" default="false" />
+  <arg name="debug" default="false" />
+
+
+  <!-- Launch moveit -->
+  <include file="$(find ur_sim)/launch/move_group.launch">
+    <arg name="debug" default="$(arg debug)" />
+  </include>
+</launch>

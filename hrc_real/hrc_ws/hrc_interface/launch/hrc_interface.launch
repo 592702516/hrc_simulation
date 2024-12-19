@@ -1,0 +1,16 @@
+<launch>
+
+  <!-- <env name="PYTHONPATH" value="$(find hrc_interface)/scripts" /> -->
+  <!-- Launch script1.py first -->
+  <node name="azure_body_tracking_processing" pkg="hrc_interface" type="azure_body_tracking_transform.py" output="screen">
+  </node>
+
+  <!-- Launch script2.py after script1.py has finished -->
+  <!-- Use an `exec` tag to run the scripts sequentially -->
+  <node name="fcl_processing" pkg="hrc_interface" type="hp_test.py" output="screen">
+  </node>
+
+  <!-- Launch script3.py after script2.py has finished -->
+  <node name="potential_field" pkg="hrc_interface" type="joint_position_movement.py" output="screen">
+  </node>
+</launch>

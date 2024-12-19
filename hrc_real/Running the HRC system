@@ -1,0 +1,114 @@
+This file will outline the steps in running the HRC assembly system, which encompasses running the UR5e, Azure Kinect, the robotiq-85 gripper, the robotiq-85 force torque sensor and the necessary ROS nodes as well. A simple command has been setup to run all related drivers and nodes as shown below:
+
+Setting up the robot & drivers:
+
+1.	Firstly, ensure the UR5e is booted on, and the necessary network cable is connected to the PC. Through the UR Pendant (Tablet with blue case for manipulating UR5e), the robot 	should be put into manual mode with the correct payload of 3kg initialised. Through the programs tab, select UR_CAP, and ensure the correct IP of 192.168.12.100 is set, but don't turn this on yet. The robot should be turned on in manual mode at this point, but not control program is running.
+
+Additionally, the Azure Kinect should also be plugged in to power and the PC, resting at a height of 1.22m above the workspace.
+
+2.	Open up terminal and browse in /hrc and run 
+	chmod +X /run_HRC
+
+3.	Execute the command 
+	./run_HRC
+
+4.	Two windows will show up, the first window will launch the azure kinect driver with bodytracking enabled and the UR5e ur_driver will also run with the velocity control enabled. Wait until this has finished executing and then press enter on the second window that is popped up. 
+
+5.	The second window will ask you to enter the PC's password to give it adequate positions for opening the COM port. On the UR pendant, run the control from testbed program underneath UR_CAP then enter the password. After entering this password, the gripper should function and the transforms between the newly initialised bench frame, the depth camera link and 	the ur5e base link should be set.
+
+	a.	An issue can occur  where the script refuses to connect to the gripper and the sensor. To resolve this, you need to terminate the terminal and re-run the following 			commands:
+		i.	Type ctrl-c and head into /hrc/hrc_ws/ within the second terminal window.
+		ii.	Run:
+		 		source devel/setup.bash 
+		iii.	Run:
+				sudo chmod -t /tmp
+				sudo chmod 777 /tmp/ttyUR
+				sudo chmod +t /tmp
+				sudo chmod 777 /dev/ttyUSB0
+		
+		iv.	Run:
+				roslaunch hrc_interface run_gripper_transform_rviz.launch
+	
+	b.	Repeat steps i-iv until the ROS has successfully connected to the gripper and the sensor.
+
+6.	 Run 'RVIZ' through a new terminal window and within RVIZ open the hrc_scene.rviz file located in /hrc. The robot should now be ready to control with the python scripts.
+
+Both the launch files in /hrc/hrc_ws/src/hrc_interface/launch can be modified to change the driver settings for each connected device. Additionally, the transforms can also be changed if you wish to mount the camera at a different location or want to move the robot along the timing belt. A set of different commands for the drivers are available in the HRC COMMANDS file in /hrc, otherwise the Azure Kinect ROS driver and the ur_driver GitHub pages can be visited to see a full list of available configurations for each driver. 
+
+Alternatively, the drivers can be manually booted by doing the following:
+
+In a new terminal, head to /hrc/hrc_ws and run:
+
+	source devel/setup.bash
+
+This needs to be done every time a new terminal is opened for each command:
+
+1.	Launch a ROS trajectory controller for the UR5e:
+		roslaunch ur_robot_driver ur5e_bringup.launch use_tool_communication:=true tool_voltage:=24 tool_baud_rate:=115200 tool_stop_bits:=1 tool_rx_idle_chars:=1.5 				tool_tx_idle_chars:=3.5 tool_device_name:=/tmp/ttyUR robot_ip:=192.168.12.100 \kinematics_config:=$HOME/my_robot_calibration.yaml'
+
+	or for velocity control 
+
+		roslaunch ur_robot_driver ur5e_bringup.launch robot_ip:=192.168.12.100 \kinematics_config:=$HOME/my_robot_calibration.yaml controllers:="joint_state_controller 			speed_scaling_state_controller force_torque_sensor_controller joint_group_vel_controller" stopped_controllers:='scaled_pos_joint_traj_controller' 
+
+2.	Launch the Azure Kinect camera through ROS, with body tracking enabled	
+		roslaunch azure_kinect_ros_driver driver.launch sensor_sn:=000283101212 depth_mode:=NFOV_2X2BINNED color_resolution:=1536P fps:=30 body_tracking_enabled:=true 				body_tracking_smoothing_factor:=0
+
+3.	Launch the gripper
+		sudo chmod -t /tmp
+		sudo chmod 777 /tmp/ttyUR
+		sudo chmod +t /tmp
+		roslaunch robotiq_85_bringup robotiq_85.launch
+
+4.	Launch the Force-Torque sensor
+		sudo chmod 777 /dev/ttyUSB0
+		roslaunch robotiq_ft_sensor ft_sensor.launch
+
+5.	Next you need to run the scripts associated with transforming each coordinate frame to a global reference frame, hence the following python scripts should be run.
+		/hrc/hrc_ws/src/hrc_interface/scripts/legacy/intiate_global_frame.py
+		/hrc/hrc_ws/src/hrc_interface/scripts/legacy/camera_transform.py
+		/hrc/hrc_ws/src/hrc_interface/scripts/legacy/UR5e_transform.py
+	These commands ensure that all components are handling coordinates in the same global reference frame.
+
+If you want to add global planning, open a new terminal for each of the following commands and run:
+	source devel/setup.bash
+
+	roslaunch ur5e_moveit_config moveit_planning_execution.launch limited:=true
+	roslaunch ur5e_moveit_config moveit_rviz.launch
+
+
+Now that the robot and drivers are set up, the python scripts to start the iHRC system are listed below.
+
+
+Running the main program:
+
+
+1. Run the the body tracking script 'azure_full_body_publishing.py'
+	hrc\hrc_ws\src\hrc_interface\scripts\azure_full_body_publishing.py
+
+2. Run the robot joint trajectory controller script 'joint_position_movement.py'
+	hrc\hrc_ws\src\hrc_interface\scripts\joint_position_movement.py
+
+3. Run the robot proximity checking script 'hp_test.py'
+	hrc\hrc_ws\src\hrc_interface\scripts\hp_test.py
+
+4. Run the global planning initialiser script 'global_planning.py'
+	hrc\hrc_ws\src\hrc_interface\scripts\global_planning.py
+
+5. Run the global planning script 'test_moveit.py'
+	hrc\hrc_ws\src\hrc_interface\scripts\test_moveit.py
+
+6. Run the ROS callback handler script 'HRC_system.py'
+	hrc-main\hrc_ws\src\hrc_interface\scripts\src\HRC_system.py
+
+
+These scripts will initialise the Azure body-tracking, create workspace boundary constraints, start dynamic and global obstacle avoidance algorithms, and then initialise the FSM to start the complex assembly task.
+
+
+
+
+
+
+
+
+
+
