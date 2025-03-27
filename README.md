@@ -1,6 +1,5 @@
 # ROS Control
-This project is used to control the UR5e + Linear rail completed by Industrial AI Research Team.
-[![Watch the video](https://i.ytimg.com/vi/O54NXTF1nhs/maxresdefault.jpg?sqp=-oaymwEmCIAKENAF8quKqQMa8AEB-AH-CYAC0AWKAgwIABABGGUgYShXMA8=&rs=AOn4CLD-y80i6C_E7O8E1oOmRDOmnVWYMA)](https://www.youtube.com/watch?v=O54NXTF1nhs)
+This project is used to control the UR5e + Linear rail completed by Industrial AI Research Team Rui Zhou.
 
 Follow the instruction step by step to build the project, system requirement: Ubuntu 20.04
 
