@@ -47,6 +47,8 @@ to:
 ```bash
 deb [arch=amd64] https://packages.microsoft.com/ubuntu/18.04/prod bionic main
 # deb-src [arch=amd64] https://packages.microsoft.com/ubuntu/18.04/prod bionic main
+deb [arch=amd64] https://packages.microsoft.com/ubuntu/20.04/prod focal main
+
 ```
 
 3.Rerun `sudo apt-get update`
@@ -54,11 +56,11 @@ deb [arch=amd64] https://packages.microsoft.com/ubuntu/18.04/prod bionic main
 4.Install Kinect Packages
 
 ```bash
-sudo apt install k4a-tools
-sudo apt install libk4a1.4-dev
-# sudo apt install libk4a1.3-dev
-# sudo apt install libk4abt1.0-dev
-# sudo apt install k4a-tools=1.3.0
+sudo apt install libk4a1.4=1.4.1
+sudo apt install libk4a1.4-dev=1.4.1
+sudo apt install k4a-tools=1.4.1
+sudo apt install libk4abt1.1-dev
+# make sure the version is correct
 
 ```
 
@@ -108,53 +110,36 @@ source ~/.bashrc
 ## Run following commands in sequence
 ```bash
 roslaunch azure_kinect_ros_driver driver.launch
-
 roslaunch yolo_run yolov5.launch
-
 roslaunch ur_robot_driver ur5e_bringup.launch
-
 roslaunch robotiq_85_bringup robotiq_85.launch
-
 roslaunch robotiq_ft_sensor ft_sensor.launch
-
 roslaunch vention_conveyor_bringup vention_conveyor.launch 
-
 rviz -d src/workbench/workbench_bringup/launch/combine.rviz
-
 rosrun pycontrol ros_demo.py
 ```
 ## Run following commands in sequence for simulation
 ```
 roslaunch ur_sim run_sim.launch
-
 python3 python3 ~/HRC_robot/src/pycontrol/scripts/sim/detect_object_pick.py
 ```
 ## Note for hrc simulation
 Ensure that the simulation environment correctly loads a red cube and that the camera can detect it properly. There are two camera topics available: `azure_kinect_camera_1`, which is mounted in the air, and `azure_kinect_camera`, mounted on the robot. When adapting real-world code for the simulation environment, double-check that the interface names match; in the simulation, `pycontrol` modules have a `_sim` suffix. You can disregard PID configuration as it isn’t an issue. Also, the green highlights are meant for the gripper plugin to aid in grasping; feel free to ignore these as well.
 
-## Run following commands in sequence for HRC real pick 
+## Run following commands in sequence for HRC pick 
 ```
-cd
-
-cd hrc_real
-
+cd ~/hrc_real
 chmod +X /run_HRC
-
 ./run_HRC
-
+roslaunch ur5e_moveit_config ur5e_moveit_planning_execution.launch
 python3 ~/hrc_interface\scripts\azure_full_body_publishing.py
-
 python3 ~/hrc_interface\scripts\joint_position_movement.py
-
 python3 ~/hrc_interface\scripts\hp_test.py
-
-python3 ~/hrc_interface\scripts\global_planning.py
-
+python3 ~/hrc_interface\scripts\GlobalPlanning.py
 python3 ~/hrc_interface\scripts\test_moveit.py
-
 python3 ~/hrc_interface\scripts\HRC_system.py
 ```
-## Note for hrc real pick
+## Note for hrc pick
 The `./run_hrc.sh` script conveniently starts all necessary servers for operating the robot in the real-world setup. Open a new terminal window to launch RViz, and load the `hrc_scene.rviz` file within RViz to visualize the setup. The robot should now be ready for control via Python scripts. For more detailed information, refer to the "Running the HRC System" guide located in `~/HRC_robot/hrc_real/Running the HRC System`.
 
 
